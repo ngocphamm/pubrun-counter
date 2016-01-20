@@ -25,9 +25,14 @@ try {
 
         $pdfFileLink = $linkNode->attributes['href']->value;
 
-        if ($pdfFileLink === '') {
+        if ($pdfFileLink === '' || stripos($pdfFileLink, '.pdf') === false) {
             throw new Exception('No RUNLOG PDF link found from the web page!');
         }
+
+        $fileName = basename($pdfFileLink);
+        if ($fileName !== '' && $fileName === trim(file_get_contents('filename.txt'))) continue;
+
+        file_put_contents('filename.txt', $fileName);
 
         // Download the file
         $file = file_put_contents(LOCAL_PDF_FILENAME, file_get_contents($pdfFileLink));
