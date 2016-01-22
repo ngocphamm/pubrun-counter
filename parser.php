@@ -1,7 +1,13 @@
 <?php
 
-include 'vendor/autoload.php';
-include 'config.php';
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/config.php';
+
+use Httpful\Request;
+use Monolog\Logger;
+use Monolog\Handler\LogglyHandler;
+use Monolog\Formatter\LogglyFormatter;
+use Smalot\PdfParser\Parser;
 
 define('LOCAL_PDF_FILENAME', 'runlog.pdf');
 
@@ -12,7 +18,7 @@ try {
     }
 
     // Get the Pub's page to parse for PDF file available
-    $pageText = \Httpful\Request::get($config['pageLink'])->send();
+    $pageText = Request::get($config['pageLink'])->send();
 
     // Try to parse the page for PDF file link
     $dom = new DOMDocument();
@@ -42,7 +48,7 @@ try {
         }
 
         // Parse pdf file and build necessary objects.
-        $parser = new \Smalot\PdfParser\Parser();
+        $parser = new Parser();
         $pdf    = $parser->parseFile(LOCAL_PDF_FILENAME);
         $text = $pdf->getText();
 
@@ -57,7 +63,7 @@ try {
         $runCount = intval(substr($me, 8));
 
         // Post the count to Numerous.
-        $response = \Httpful\Request::post("https://api.numerousapp.com/v2/metrics/{$config['numerousMetricId']}/events")                  // Build a PUT request...
+        $response = Request::post("https://api.numerousapp.com/v2/metrics/{$config['numerousMetricId']}/events")                  // Build a PUT request...
             ->sendsJson()                                       // tell it we're sending (Content-Type) JSON...
             ->authenticateWith($config['numerousApiKey'], '')   // authenticate with basic auth...
             ->body('{"value":"' . $runCount . '"}')             // attach a body/payload...
@@ -71,6 +77,11 @@ try {
     return 0;
 } catch (Exception $e) {
     echo $e->getMessage();
+
+    $log = new Logger('PubRunCounter');
+    $log->pushHandler(new LogglyHandler('28ae9802-c9ee-47cd-a7b9-366901aa1841/tag/monolog', Logger::INFO));
+    $log->addError($e->getMessage());
+
     return 1; // So the console will know that it's a failed execution
 } finally {
     // Janitor

@@ -1,6 +1,7 @@
 {
     "require": {
         "smalot/pdfparser": "*",
-        "nategood/httpful": "^0.2.20"
+        "nategood/httpful": "^0.2.20",
+        "monolog/monolog": "^1.17"
     }
 }
