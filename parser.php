@@ -27,7 +27,7 @@ try {
     $links = $dom->getElementsByTagName('a');
 
     foreach ($links as $linkNode) {
-        if (strpos($linkNode->nodeValue, 'RUNLOG') === false) continue;
+        if (stripos($linkNode->nodeValue, 'runlog') === false) continue;
 
         $pdfFileLink = $linkNode->attributes['href']->value;
 
