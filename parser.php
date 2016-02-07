@@ -11,7 +11,12 @@ use Smalot\PdfParser\Parser;
 
 define('LOCAL_PDF_FILENAME', 'runlog.pdf');
 
+$log = new Logger('PubRunCounter');
+$log->pushHandler(new LogglyHandler('28ae9802-c9ee-47cd-a7b9-366901aa1841/tag/monolog', Logger::INFO));
+
 try {
+    $log->addInfo('Started Pub Run Counter Script.');
+
     $config = loadConfig();
     if (!is_array($config) || count($config) === 0) {
         throw new Exception("Need config keys and values!");
@@ -72,14 +77,14 @@ try {
         if ($response->code === 429) {
             throw new Exception('Numerous API rate limit: Too Many Requests');
         }
+
+        $log->addInfo("Pub run count updated to {$runCount}");
     }
 
     return 0;
 } catch (Exception $e) {
     echo $e->getMessage();
 
-    $log = new Logger('PubRunCounter');
-    $log->pushHandler(new LogglyHandler('28ae9802-c9ee-47cd-a7b9-366901aa1841/tag/monolog', Logger::INFO));
     $log->addError($e->getMessage());
 
     return 1; // So the console will know that it's a failed execution
