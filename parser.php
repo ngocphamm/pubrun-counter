@@ -43,9 +43,9 @@ try {
         }
 
         $fileName = basename($pdfFileLink);
-        if ($fileName !== '' && $fileName === trim(file_get_contents('filename.txt'))) continue;
+        if ($fileName !== '' && $fileName === trim(file_get_contents(__DIR__ . '/filename.txt'))) continue;
 
-        file_put_contents('filename.txt', $fileName);
+        file_put_contents(__DIR__ . '/filename.txt', $fileName);
 
         // Download the file
         $file = file_put_contents(LOCAL_PDF_FILENAME, file_get_contents($pdfFileLink));
