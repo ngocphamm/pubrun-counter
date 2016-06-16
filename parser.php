@@ -22,6 +22,8 @@ try {
         throw new Exception("Need config keys and values!");
     }
 
+    if ($config['enabled'] !== true) return;
+
     // Get the Pub's page to parse for PDF file available
     $pageText = Request::get($config['pageLink'])->send();
 
@@ -68,15 +70,16 @@ try {
         $runCount = intval(substr($me, 8));
 
         // Post the count to Numerous.
-        $response = Request::post("https://api.numerousapp.com/v2/metrics/{$config['numerousMetricId']}/events")                  // Build a PUT request...
-            ->sendsJson()                                       // tell it we're sending (Content-Type) JSON...
-            ->authenticateWith($config['numerousApiKey'], '')   // authenticate with basic auth...
-            ->body('{"value":"' . $runCount . '"}')             // attach a body/payload...
-            ->send();
+        // NUMEROUS HAS SHUT DOWN!!!
+        // $response = Request::post("https://api.numerousapp.com/v2/metrics/{$config['numerousMetricId']}/events")
+        //     ->sendsJson()                                       // tell it we're sending (Content-Type) JSON...
+        //     ->authenticateWith($config['numerousApiKey'], '')   // authenticate with basic auth...
+        //     ->body('{"value":"' . $runCount . '"}')             // attach a body/payload...
+        //     ->send();
 
-        if ($response->code === 429) {
-            throw new Exception('Numerous API rate limit: Too Many Requests');
-        }
+        // if ($response->code === 429) {
+        //     throw new Exception('Numerous API rate limit: Too Many Requests');
+        // }
 
         $log->addInfo("Pub run count updated to {$runCount}");
     }
